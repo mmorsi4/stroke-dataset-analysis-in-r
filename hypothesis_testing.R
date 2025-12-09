@@ -79,3 +79,5 @@ TukeyHSD(aov_smoke)
 
 df$gender <- NULL
 df$Residence_type <- NULL
+
+write.csv(df, "data_after_testing.csv", row.names = FALSE)

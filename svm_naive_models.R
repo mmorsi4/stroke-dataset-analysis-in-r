@@ -9,13 +9,28 @@ library(ggplot2)
 df <- read.csv("cleaned_stroke_data.csv")
 df$stroke <- as.factor(df$stroke)
 
+# Explicit feature list (prevents mismatch bugs)
+selected_features <- c(
+  "age",
+  "hypertension",
+  "heart_disease",
+  "ever_married",
+  "work_type",
+  "smoking_status",
+  "avg_glucose_level",
+  "bmi",
+  "stroke"
+)
+
+df <- df[, selected_features]
+
 set.seed(123)
 trainIndex <- sample(1:nrow(df), 0.8 * nrow(df))
 trainData <- df[trainIndex, ]
 testData  <- df[-trainIndex, ]
 
-categorical_cols <- c("gender","hypertension","heart_disease",
-                      "ever_married","work_type","Residence_type","smoking_status")
+categorical_cols <- c("hypertension","heart_disease",
+                      "ever_married","work_type","smoking_status")
 
 # Convert categorical to numeric for SMOTE
 train_num <- trainData

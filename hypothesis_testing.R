@@ -1,6 +1,8 @@
 ###############################################################################
 #                             Hypothesis Testing
 ###############################################################################
+library(ggplot2)
+
 
 df <- read.csv("cleaned_stroke_data.csv", na.strings = c("N/A", "Unknown"))
 
@@ -81,3 +83,50 @@ df$gender <- NULL
 df$Residence_type <- NULL
 
 write.csv(df, "data_after_testing.csv", row.names = FALSE)
+
+pvals <- data.frame(
+  variable = c(
+    "age",
+    "avg_glucose_level",
+    "bmi",
+    "hypertension",
+    "heart_disease",
+    "ever_married",
+    "work_type",
+    "smoking_status",
+    "gender",
+    "Residence_type"
+  ),
+  p_value = c(
+    2.2e-16,      # age
+    1.76e-08,     # glucose
+    1.85e-04,     # bmi
+    2.2e-16,      # hypertension (very small)
+    2.2e-16,      # heart disease
+    1e-06,        # ever married (approx)
+    4.91e-10,     # work type (ANOVA)
+    3.23e-06,     # smoking
+    0.52,         # gender
+    0.27          # residence
+  )
+)
+
+pvals$significance <- ifelse(pvals$p_value < 0.05, "Significant", "Not Significant")
+pvals$neg_log_p <- -log10(pvals$p_value)
+
+ggplot(pvals, aes(x = reorder(variable, neg_log_p),
+                  y = neg_log_p,
+                  fill = significance)) +
+  geom_bar(stat = "identity") +
+  geom_hline(yintercept = -log10(0.05),
+             linetype = "dashed",
+             color = "red") +
+  coord_flip() +
+  labs(
+    title = "Predictor Significance Based on Hypothesis Testing",
+    x = "Variable",
+    y = expression(-log[10](p-value)),
+    fill = "Result"
+  ) +
+  theme_minimal(base_size = 13)
+
